@@ -1,0 +1,228 @@
+```{r}
+library(shiny)
+library(tidyverse)
+library(shinydashboard)
+library(DT)
+library(ggforce)
+library(plotly)
+library(dplyr)
+library(zoo)
+library(tidyverse)
+library(catapultR)
+```
+
+
+
+
+```{r}
+token <- ofCloudCreateToken(sToken =  "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI0NjFiMTExMS02ZjdhLTRkYmItOWQyOS0yMzAzOWZlMjI4OGUiLCJqdGkiOiIzODk4NTlmYjVhZGI3MThiODdhZTE2YTNhZTQ3MjYxMGY3NTRkZDUyNGZmNjE0NmJhYjU1ODU3NWZmZTEwYzc3MzdkYjA4YWU4MDAwOGZlMSIsImlhdCI6MTczODM1MTU1NC4zODQyMjcsIm5iZiI6MTczODM1MTU1NC4zODQyMjksImV4cCI6NDg5MTk1MTU1NC4zNzM4NTEsInN1YiI6ImEyYjA5NTQyLTE4NTktNDg3ZC1iMjA3LTNhYTg2YWZkMGIxOCIsInNjb3BlcyI6WyJjb25uZWN0Iiwic2Vuc29yLXJlYWQtb25seSJdfQ.HmHqGsDzfu7-QrIEFKP1E3-sXaC3sRgUibtpzzniGvORt8eKViHNecfydQwv8YbzXOQ51GCiFXCXa96LvwP3cSbT2OipxPF3umEgmVmeYB4q-ZWdgFcggW7whBFc5UPDEvHX--f9XWe3uSgAA4Y9ha2vLSGsV7NuiEs2ceVBmhDkIjCC0NZgDcEBOVsMxSPNSqLOkhllwgN4IPnc9i3CKWactc5oVDkqAeI5wAoWwviNJEV-lt-WeJ2ZRASGON1WhRNrcZue-GbhLCuop3ISVtTd2VikR7NTuMbGyPhVxafxQCS91VOtHbxNHu_iUPIjASSjHkS_iE-W4e62bIeqnOnThR-cPUIDbFFM1mV6Df6KfCPaR4a58R5Mp9MPTam2l-G2XISh5cTjp2fK6fOu0Cd_V4VyAhq40eAV6zvWpd820C3UPMJjf1fgUy6hcSAWmdJ62CoiXFUrmLt7ci_qbeqU1YXyJ6ENc32VDK1zGuCfFnYa-OHIrXUDEkdhdeUuj66dDJi31MZtpEGq8eYFsJrXkgY4vhB-SYVr0IM1bvnoKQvG9Qv7qDMPNY3tDQjex9s7W3XlKC5IqUlf5E6FJ5cZL6aX24nPusHcC3Lp2pC0BOOc9cMZBCc4_S0cG7aadrvBTSNXd6g_hTFttz91hcnSSbef5YfoWBckRVmA_2c",
+                            sRegion = "America")
+
+activities  <- ofCloudGetActivities(token)
+
+df<- ofCloudGetStatistics(
+      token,
+      params = c("athlete_name", "position_name", "dynamic_movement_load",
+                 "total_distance", "time_length","baseball_swing_count", "baseball_swing_maxpl", "baseball_throw_count", "baseball_throw_maxpl",   "total_player_load", "softball_sprint", "throw_pl_per_throw","throw_load_per_throw_scaled", "swing_load_per_swing", "date", "weighted_dist",
+                 "period_id", "period_name", "activity_name", "start_time", "end_time",  "day_name", "baseball_throw_count"),
+      groupby = c("athlete", "period", "activity"),
+      filters = list(name = "activity_id",
+                     comparison = "=",
+                     values = activities$id))
+
+df <-df %>%
+         mutate(date = as.Date(date, format = "%d/%m/%Y")) %>%
+  filter(athlete_name != "Ava Bradshaw")
+df <- df %>%
+  mutate(position_name = ifelse(grepl("pitcher", position_name, ignore.case = TRUE), 
+                                "Pitcher", 
+                                "Field"))
+
+```
+
+
+```{r}
+# Load library for generating random names
+library(randomNames)
+
+# Generate 19 unique female names (both first and last)
+anonymized_names <- randomNames(19, gender = 1, which.names = "both", name.order = "first.last")
+
+# List of actual athlete names
+athlete_names <- c(
+  "Jada Baker", "Linh Le", "Jessica Oakland", "Aminah Vega", "Ava Bradshaw",
+  "Ana Gold", "Dakota Farmer", "Amiah Burgess", "Thessa Malau'ulu", "Kairi Rodriguez",
+  "Cassidy Curd", "KK Mathis", "D'Auna Jennings", "Sophie Garner-MacKinnon",
+  "Dani Drogemuller", "Brooklinn Thomas", "Aleyah Terrell", "Gabriella Mike", "Hailey Shuler"
+)
+
+# Create a named vector to map athlete names to anonymized names
+name_mapping <- setNames(anonymized_names, athlete_names)
+
+# Apply the mapping to anonymize athlete names in your dataframe
+# Assuming your dataframe is called df and has a column named 'athlete_name':
+df$athlete_name <- name_mapping[df$athlete_name]
+
+# Now df$athlete_name contains the anonymized names
+print(name_mapping)  # View the mapping
+
+df
+```
+
+
+```{r}
+# Load the library to generate random college names
+library(randomNames)
+
+# List of random college names
+college_names <- c(
+  "University of Florida", "Stanford University", "Harvard University", 
+  "Duke University", "University of Michigan", "UCLA", 
+  "Princeton University", "Ohio State University", "Texas A&M University", 
+  "University of North Carolina", "University of Southern California",
+  "University of Georgia", "University of Texas", "University of Virginia", 
+  "Massachusetts Institute of Technology", "California Institute of Technology",
+  "University of Chicago", "University of Pennsylvania", "Cornell University", 
+  "Columbia University", "Yale University", "University of Washington", 
+  "University of California, Berkeley", "Vanderbilt University", 
+  "University of Notre Dame", "Pennsylvania State University", 
+  "Northwestern University", "University of Wisconsin-Madison", 
+  "University of Minnesota", "University of Miami", "Clemson University", 
+  "University of Arizona", "Arizona State University", 
+  "University of Illinois Urbana-Champaign", "Purdue University", 
+  "University of Colorado Boulder", "University of Oregon", 
+  "University of Alabama", "University of South Carolina", 
+  "University of Tennessee", "Auburn University", 
+  "University of Kansas", "University of Kentucky", 
+  "Michigan State University", "Iowa State University", 
+  "University of Iowa", "University of Oklahoma", 
+  "University of Arkansas", "Indiana University", 
+  "University of Missouri", "Rutgers University", 
+  "University of Maryland", "University of Delaware"
+)
+
+
+# Function to map activity names
+df$activity_name <- sapply(df$activity_name, function(activity) {
+  if (grepl("game", activity, ignore.case = TRUE)) {
+    random_college <- sample(college_names, 1)  # Pick a random college
+    return(paste("Game vs", random_college))
+  } else {
+    return("Practice")
+  }
+})
+
+# View the modified dataframe
+df
+
+```
+
+
+```{r}
+# Load necessary library
+library(stringr)
+
+# Get unique period names that are not in the format "I#"
+unique_periods <- unique(df$period_name)
+non_I_periods <- unique_periods[!str_detect(unique_periods, "^I\\d+$")]
+
+# Create a named vector to map each non-I period to "Drill 1", "Drill 2", etc.
+period_mapping <- setNames(paste("Drill", seq_along(non_I_periods)), non_I_periods)
+
+# Replace non-I period names with "Drill X", and keep "I#" formatted values as is
+df$period_name <- sapply(df$period_name, function(period) {
+  if (period %in% names(period_mapping)) {
+    return(period_mapping[[period]])  # Replace with "Drill X"
+  } else {
+    return(period)  # Keep "I#" format as is
+  }
+})
+
+# View the modified dataframe
+
+
+```
+
+```{r}
+df$start_time <- as.character(df$start_time)
+df$end_time <- as.character(df$end_time)
+df
+```
+
+```{r}
+# Load necessary library
+# Example data frame
+
+# # Randomly adding or subtracting a number greater than 0 to each row
+df$total_distance <- sapply(df$total_distance, function(x) {
+  rand_num <- sample(1:100, 1)  # Random number between 1 and 10
+  if (x > 0) {
+    if (runif(1) > 0.5) {  # Randomly choose between addition and subtraction
+      x + rand_num
+    } else {
+      x - rand_num
+    }
+  } else {
+    x  # If rand_num is not greater than 0, keep the original value
+  }
+})
+df$total_distance <- ifelse(df$total_distance < 0, 0, df$total_distance)
+# Print updated dataframe
+print(df)
+
+# Apply the transformation to every numeric column except start_time and end_time
+df2 <- df %>%
+  mutate(across(where(is.numeric) & !starts_with("start_time") & !starts_with("end_time"),
+                ~ ifelse(. > 0, 
+                         ifelse(runif(length(.)) > 0.5, . + sample(1:100, length(.), replace = TRUE), . - sample(1:100, length(.), replace = TRUE)),
+                         .), 
+                .names = "{.col}")) %>%
+  mutate(across(where(is.numeric), ~ ifelse(. < 0, 0, .)))
+
+# Print updated dataframe
+print(df)
+# Print updated dataframe
+print(df2)
+
+```
+
+```{r}
+# List of specific columns to modify
+# List of specific columns to modify
+columns_to_modify <- c("total_distance", "total_player_load", "baseball_throw_count", 
+                       "baseball_swing_count", "baseball_throw_maxpl", "baseball_swing_maxpl", 
+                       "dynamic_movement_load", "softball_sprint", "throw_pl_per_throw", 
+                       "throw_load_per_throw_scaled", "swing_load_per_swing", "weighted_dist")
+
+# Apply the transformation to each column
+df[columns_to_modify] <- lapply(df[columns_to_modify], function(column) {
+  sapply(column, function(x) {
+    # Check if x is not NA and is greater than 0
+    if (!is.na(x) && x > 0) {
+      rand_num <- sample(1:100, 1)  # Random number between 1 and 100
+      if (runif(1) > 0.5) {  # Randomly choose between addition and subtraction
+        return(x + rand_num)
+      } else {
+        return(x - rand_num)
+      }
+    } else {
+      return(x)  # If NA or <= 0, keep the original value
+    }
+  })
+})
+
+# Ensure that any negative values are set to 0
+df[columns_to_modify] <- lapply(df[columns_to_modify], function(column) {
+  ifelse(column < 0, 0, column)
+})
+
+# Print updated dataframe
+print(df)
+
+
+```
+
+
+```{r}
+write.csv(df, "Softball_Data.csv")
+```

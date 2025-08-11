@@ -1,0 +1,105 @@
+---
+output: 
+  pdf_document:
+    toc: false
+    number_sections: false
+    # includes:
+params:
+  pitcher_data: NA
+  pitchers_day_data: NA
+  week_number: NA
+header-includes: |
+  \usepackage{fancyhdr}
+  \pagestyle{fancy}
+  \fancyhead[L]{Pitcher Report}
+
+  \thispagestyle{fancy}
+---
+```{r, include= FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+library(grid)
+library(dplyr)
+```
+
+
+```{r}
+pitcher_data_df <- params$pitcher_data
+pitchers_day_data_df <- params$pitchers_day_data
+all_athletes <- unique(pitcher_data_df$athlete_name)
+
+
+# Define default data for missing players
+default_day_data <- data.frame(
+  athlete_name = NA,
+  day_name = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"),
+  sum_dynamic_movement_load = 0
+)
+
+default_week_data <- data.frame(
+  athlete_name = NA,
+  week_number = 1:52,  # Assuming 52 weeks in a year
+  sum_dynamic_movement_load = 0
+)
+
+for (player in all_athletes) {
+  # Filter player data or use defaults with zero values
+  player_data_day <- pitchers_day_data_df %>% filter(athlete_name == player)
+  if (nrow(player_data_day) == 0) {
+    player_data_day <- default_day_data
+  }
+
+  player_data_week <- pitcher_data_df %>% filter(athlete_name == player)
+  if (nrow(player_data_week) == 0) {
+    player_data_week <- default_week_data
+  }
+
+  # Create player header
+  player_header <- textGrob(
+    label = player,
+    gp = gpar(fontsize = 16, fontface = "bold")
+  )
+  
+  # Daily movement load plot
+  daily_plot <- ggplot(
+    player_data_day,
+    aes(
+      x = factor(day_name, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")),
+      y = sum_dynamic_movement_load
+    )
+  ) +
+    geom_bar(stat = "identity", fill = "steelblue") +
+    scale_x_discrete(drop = FALSE)  +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(x = "Day of Week",
+         y = "Total Dynamic Movement Load",
+         title = "Daily Load")
+  
+  # Weekly movement load plot
+  weekly_plot <- ggplot(
+    player_data_week,
+    aes(x = week_number, y = sum_dynamic_movement_load)
+  ) +
+    geom_bar(stat = "identity", fill = "darkblue") +
+    scale_x_discrete(limits = factor(1:params$week_number))+
+    labs(x = "Week Number in Season",
+         y = "Weekly Dynamic Movement Load",
+         title = "Weekly Load")
+final_plot <- grid.arrange(
+    player_header,
+    arrangeGrob(daily_plot, weekly_plot, ncol = 2),  # Side-by-side graphs
+    nrow = 2,
+    heights = c(.1,2)  # Adjust header space
+  )
+
+  grid.draw(final_plot)
+}
+```
+
+
+
+

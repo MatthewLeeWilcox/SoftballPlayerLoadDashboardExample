@@ -1,0 +1,90 @@
+body {
+    background-image: url('duke_softball.jpg'); /* Set background image */
+    background-position: bottom left;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* Keeps image in place while scrolling */
+    color: #000000; /* Duke Black text */
+    font-family: sans-serif;
+  }
+
+  .navbar {
+    background-color: #001369; /* Duke Blue navbar */
+    border-color: #001369;
+  }
+
+  .navbar-default .navbar-brand {
+    color: #FFFFFF !important; /* White title text */
+  }
+
+  .navbar-default .navbar-nav > li > a {
+    color: #FFFFFF !important; /* White navbar links */
+  }
+
+  .navbar-default .navbar-nav > .active > a,
+  .navbar-default .navbar-nav > .active > a:hover,
+  .navbar-default .navbar-nav > .active > a:focus {
+    background-color: #001055; /* Slightly darker blue for active tab */
+    color: #FFFFFF !important;
+  }
+
+  .panel-heading {
+    background-color: #001369; /* Duke Blue panel headers */
+    color: #FFFFFF;
+    border-color: #001369;
+  }
+
+  .well {
+    background-color: #f0f0f5; /* Light gray for wells */
+    border: 1px solid #ddd;
+  }
+
+  .btn-primary {
+    background-color: #001369; /* Duke Blue buttons */
+    border-color: #001369;
+  }
+
+  .btn-primary:hover {
+    background-color: #001055;
+    border-color: #001055;
+  }
+
+  .card { /* Style for your card divs */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #FFFFFF; /* White card background */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  }
+
+  /* Plot styling (example) */
+  .plot-container {
+    background-color: #FFFFFF; /* White plot background */
+  }
+
+  .plot-container .point {
+    color: #001369; /* Duke Blue points */
+  }
+  .plot-container .axis-text, .plot-container .axis-title{
+    color: #000000;
+  }
+  .plot-container .legend-title, .plot-container .legend-text{
+    color: #000000;
+  }
+  .table { /* Style for tables (DTOutput) */
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  .table th, .table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .table th {
+    background-color: #001369; /* Duke Blue table headers */
+    color: #FFFFFF;
+  }
+  
